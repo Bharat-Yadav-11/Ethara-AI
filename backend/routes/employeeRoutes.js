@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/Employee');
+const Attendance = require('../models/Attendance');
 
 // GET all employees
 router.get('/', async (req, res) => {
@@ -29,11 +30,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-// DELETE an employee
+// DELETE an employee and there existing Attendance
 router.delete('/:id', async (req, res) => {
   try {
-    await Employee.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Employee deleted' });
+    const employeeId = req.params.id;
+
+    await Attendance.deleteMany({ employeeId: employeeId });
+
+    const deletedEmployee = await Employee.findByIdAndDelete(employeeId);
+
+    if (!deletedEmployee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.json({ message: 'Employee and their attendance records deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
