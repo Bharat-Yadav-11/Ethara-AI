@@ -234,7 +234,8 @@ function App() {
           {activeTab === 'employees' ? (
             <>
               <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[800px]">
                   <thead className="bg-slate-50 text-slate-600 text-xs uppercase font-semibold tracking-wider">
                     <tr>
                       <th className="p-4 border-b border-slate-200">Employee</th>
@@ -300,6 +301,7 @@ function App() {
                     )}
                   </tbody>
                 </table>
+                </div>
               </div>
             </>) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
