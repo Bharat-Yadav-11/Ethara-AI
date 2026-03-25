@@ -1,26 +1,31 @@
 const Attendance = require('../models/Attendance');
-const Employee = require('../models/Employee');
 
-exports.markAttendance = async (req, res, next) => {
-    try {
-        const { employeeId, date, status } = req.body;
+exports.getAllAttendance = async (req, res) => {
+  try {
+    const attendance = await Attendance.find()
+      .populate('employeeId', 'fullName')
+      .sort({ date: -1 });
+    res.json(attendance);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch attendance' });
+  }
+};
 
-        // 1. Check if employee exists
-        const employee = await Employee.findById(employeeId);
-        if (!employee) {
-            res.status(404);
-            throw new Error('Employee not found');
-        }
+exports.markAttendance = async (req, res) => {
+  const { employeeId, date, status } = req.body;
+  try {
+    const newRecord = new Attendance({ employeeId, date, status });
+    await newRecord.save();
 
-        // 2. Create record (The unique index in model prevents duplicates)
-        const record = await Attendance.create({ employeeId, date, status });
-        
-        res.status(201).json(record);
-    } catch (error) {
-        if (error.code === 11000) {
-            res.status(400);
-            return next(new Error('Attendance already marked for this date'));
-        }
-        next(error);
+    // Real-Time Notification
+    const populatedRecord = await newRecord.populate('employeeId', 'fullName');
+    if (req.io) req.io.emit('new_attendance', populatedRecord);
+
+    res.status(201).json(newRecord);
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Attendance already marked for this date' });
     }
+    res.status(400).json({ message: err.message });
+  }
 };

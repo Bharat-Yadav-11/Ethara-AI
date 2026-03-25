@@ -1,81 +1,109 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const Employee = require('./models/Employee'); 
+const Employee = require('./models/Employee');
 const Attendance = require('./models/Attendance');
+const Leave = require('./models/Leave');
 
 dotenv.config();
-
-const employees = [
-  { employeeId: "EMP001", fullName: "James Wilson", email: "james.wilson@company.com", department: "Engineering" },
-  { employeeId: "EMP002", fullName: "Linda Martinez", email: "linda.martinez@company.com", department: "HR" },
-  { employeeId: "EMP003", fullName: "Robert Brown", email: "robert.brown@company.com", department: "Sales" },
-  { employeeId: "EMP004", fullName: "Michael Davis", email: "michael.davis@company.com", department: "Engineering" },
-  { employeeId: "EMP005", fullName: "Jennifer Garcia", email: "jennifer.garcia@company.com", department: "Marketing" },
-  { employeeId: "EMP006", fullName: "William Rodriguez", email: "william.rodriguez@company.com", department: "Finance" },
-  { employeeId: "EMP007", fullName: "David Miller", email: "david.miller@company.com", department: "Engineering" },
-  { employeeId: "EMP008", fullName: "Elizabeth Taylor", email: "elizabeth.taylor@company.com", department: "Engineering" },
-  { employeeId: "EMP009", fullName: "Barbara Anderson", email: "barbara.anderson@company.com", department: "HR" },
-  { employeeId: "EMP010", fullName: "Richard Thomas", email: "richard.thomas@company.com", department: "Sales" },
-  { employeeId: "EMP011", fullName: "Joseph Moore", email: "joseph.moore@company.com", department: "Engineering" },
-  { employeeId: "EMP012", fullName: "Susan Jackson", email: "susan.jackson@company.com", department: "Marketing" },
-  { employeeId: "EMP013", fullName: "Thomas White", email: "thomas.white@company.com", department: "Finance" },
-  { employeeId: "EMP014", fullName: "Jessica Harris", email: "jessica.harris@company.com", department: "Engineering" },
-  { employeeId: "EMP015", fullName: "Charles Martin", email: "charles.martin@company.com", department: "Engineering" },
-  { employeeId: "EMP016", fullName: "Karen Thompson", email: "karen.thompson@company.com", department: "HR" },
-  { employeeId: "EMP017", fullName: "Christopher Garcia", email: "christopher.garcia@company.com", department: "Sales" },
-  { employeeId: "EMP018", fullName: "Sarah Martinez", email: "sarah.martinez@company.com", department: "Engineering" },
-  { employeeId: "EMP019", fullName: "Daniel Robinson", email: "daniel.robinson@company.com", department: "Marketing" },
-  { employeeId: "EMP020", fullName: "Lisa Clark", email: "lisa.clark@company.com", department: "Finance" },
-  { employeeId: "EMP021", fullName: "Matthew Rodriguez", email: "matthew.rodriguez@company.com", department: "Engineering" },
-  { employeeId: "EMP022", fullName: "Betty Lewis", email: "betty.lewis@company.com", department: "Engineering" },
-  { employeeId: "EMP023", fullName: "Anthony Lee", email: "anthony.lee@company.com", department: "HR" },
-  { employeeId: "EMP024", fullName: "Sandra Walker", email: "sandra.walker@company.com", department: "Sales" },
-  { employeeId: "EMP025", fullName: "Mark Hall", email: "mark.hall@company.com", department: "Engineering" },
-  { employeeId: "EMP026", fullName: "Ashley Allen", email: "ashley.allen@company.com", department: "Marketing" },
-  { employeeId: "EMP027", fullName: "Donald Young", email: "donald.young@company.com", department: "Finance" },
-  { employeeId: "EMP028", fullName: "Steven Hernandez", email: "steven.hernandez@company.com", department: "Engineering" },
-  { employeeId: "EMP029", fullName: "Paul King", email: "paul.king@company.com", department: "Engineering" },
-  { employeeId: "EMP030", fullName: "Kimberly Wright", email: "kimberly.wright@company.com", department: "HR" },
-  { employeeId: "EMP031", fullName: "Andrew Lopez", email: "andrew.lopez@company.com", department: "Sales" },
-  { employeeId: "EMP032", fullName: "Emily Hill", email: "emily.hill@company.com", department: "Engineering" },
-  { employeeId: "EMP033", fullName: "Joshua Scott", email: "joshua.scott@company.com", department: "Marketing" },
-  { employeeId: "EMP034", fullName: "Michelle Green", email: "michelle.green@company.com", department: "Finance" },
-  { employeeId: "EMP035", fullName: "Kevin Adams", email: "kevin.adams@company.com", department: "Engineering" },
-  { employeeId: "EMP036", fullName: "Brian Baker", email: "brian.baker@company.com", department: "Engineering" },
-  { employeeId: "EMP037", fullName: "George Gonzalez", email: "george.gonzalez@company.com", department: "HR" },
-  { employeeId: "EMP038", fullName: "Edward Nelson", email: "edward.nelson@company.com", department: "Sales" },
-  { employeeId: "EMP039", fullName: "Ronald Carter", email: "ronald.carter@company.com", department: "Engineering" },
-  { employeeId: "EMP040", fullName: "Timothy Mitchell", email: "timothy.mitchell@company.com", department: "Marketing" },
-  { employeeId: "EMP041", fullName: "Jason Perez", email: "jason.perez@company.com", department: "Finance" },
-  { employeeId: "EMP042", fullName: "Jeffrey Roberts", email: "jeffrey.roberts@company.com", department: "Engineering" },
-  { employeeId: "EMP043", fullName: "Ryan Turner", email: "ryan.turner@company.com", department: "Engineering" },
-  { employeeId: "EMP044", fullName: "Jacob Phillips", email: "jacob.phillips@company.com", department: "HR" },
-  { employeeId: "EMP045", fullName: "Gary Campbell", email: "gary.campbell@company.com", department: "Sales" },
-  { employeeId: "EMP046", fullName: "Nicholas Parker", email: "nicholas.parker@company.com", department: "Engineering" },
-  { employeeId: "EMP047", fullName: "Eric Evans", email: "eric.evans@company.com", department: "Marketing" },
-  { employeeId: "EMP048", fullName: "Stephen Edwards", email: "stephen.edwards@company.com", department: "Finance" },
-  { employeeId: "EMP049", fullName: "Larry Collins", email: "larry.collins@company.com", department: "Engineering" },
-  { employeeId: "EMP050", fullName: "Justin Stewart", email: "justin.stewart@company.com", department: "Operations" }
-];
 
 const seedDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('📦 Connected to MongoDB...');
+    console.log('📦 Connected to MongoDB');
 
-    // Clear existing data to avoid duplicates
-    console.log('Clearing existing employee data...');
-    await Employee.deleteMany({});
-    await Attendance.deleteMany({});
+    // 1. Clear existing data
+    await Promise.all([
+      Employee.deleteMany({}),
+      Attendance.deleteMany({}),
+      Leave.deleteMany({})
+    ]);
+    console.log('🧹 Old data cleared');
 
-    // Insert new data
-    console.log('Seeding new employees...');
-    await Employee.insertMany(employees);
+    // 2. Define Employees with PLAIN TEXT passwords
+    // We let the Employee Model's pre-save hook handle the hashing
+    const employees = [
+      {
+        employeeId: "ADM001",
+        fullName: "Admin HR",
+        email: "admin@hrms.com",
+        department: "Management",
+        role: "HR",
+        designation: "HR Manager",
+        status: "Active",
+        joinedDate: new Date("2022-01-01"),
+        password: "admin123" // <--- Plain text
+      },
+      {
+        employeeId: "EMP001",
+        fullName: "Arjun Mehta",
+        email: "arjun@hrms.com",
+        department: "Engineering",
+        role: "EMPLOYEE",
+        designation: "Senior Developer",
+        status: "Active",
+        joinedDate: new Date("2023-01-15"),
+        password: "emp123" // <--- Plain text
+      },
+      {
+        employeeId: "EMP002",
+        fullName: "Priya Sharma",
+        email: "priya@hrms.com",
+        department: "Design",
+        role: "EMPLOYEE",
+        designation: "UI/UX Lead",
+        status: "Active",
+        joinedDate: new Date("2023-03-22"),
+        password: "emp123"
+      },
+      {
+        employeeId: "EMP003",
+        fullName: "Rahul Gupta",
+        email: "rahul@hrms.com",
+        department: "Marketing",
+        role: "EMPLOYEE",
+        designation: "Marketing Manager",
+        status: "Active",
+        joinedDate: new Date("2022-11-10"),
+        password: "emp123"
+      },
+      {
+        employeeId: "EMP004",
+        fullName: "Sneha Patel",
+        email: "sneha@hrms.com",
+        department: "HR",
+        role: "EMPLOYEE",
+        designation: "HR Specialist",
+        status: "On Leave",
+        joinedDate: new Date("2023-06-01"),
+        password: "emp123"
+      },
+      {
+        employeeId: "EMP005",
+        fullName: "Vikram Singh",
+        email: "vikram@hrms.com",
+        department: "Finance",
+        role: "EMPLOYEE",
+        designation: "Financial Analyst",
+        status: "Inactive",
+        joinedDate: new Date("2021-09-12"),
+        password: "emp123"
+      }
+    ];
 
-    console.log('Success! 50 Employees added.');
-    process.exit();
-  } catch (err) {
-    console.error('Error seeding database:', err);
+    // 3. Insert using Loop + Save() to trigger Encryption Hook
+    // We do NOT use insertMany here because it bypasses middleware
+    for (const empData of employees) {
+        const employee = new Employee(empData);
+        await employee.save();
+    }
+
+    console.log('✅ Database seeded successfully');
+    console.log('🔑 Admin Login: admin@hrms.com / admin123');
+    console.log('🔑 Emp Login: arjun@hrms.com / emp123');
+    process.exit(0);
+
+  } catch (error) {
+    console.error('❌ Seeding failed:', error.message);
     process.exit(1);
   }
 };

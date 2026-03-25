@@ -1,23 +1,15 @@
 const mongoose = require('mongoose');
 
-const attendanceSchema = new mongoose.Schema({
-    employeeId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Employee',
-        required: true
-    },
-    date: {
-        type: String, // Store as "YYYY-MM-DD" to easily check uniqueness
-        required: true
-    },
-    status: {
-        type: String,
-        enum: ['Present', 'Absent', 'Leave'],
-        default: 'Present'
-    }
+const AttendanceSchema = new mongoose.Schema({
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  date: { type: String, required: true }, // Format: YYYY-MM-DD
+  status: { type: String, enum: ['Present', 'Absent', 'Late', 'Half-day'], default: 'Present' },
+  checkIn: { type: String, default: '09:00 AM' },
+  checkOut: { type: String, default: '06:00 PM' },
+  workHours: { type: String, default: '9h 0m' }
 }, { timestamps: true });
 
-// Prevent duplicate attendance for the same person on the same day
-attendanceSchema.index({ employeeId: 1, date: 1 }, { unique: true });
+// Prevent duplicate entries for same user on same day
+AttendanceSchema.index({ employeeId: 1, date: 1 }, { unique: true });
 
-module.exports = mongoose.model('Attendance', attendanceSchema);
+module.exports = mongoose.model('Attendance', AttendanceSchema);
